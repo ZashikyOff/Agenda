@@ -1,6 +1,8 @@
 <?php
 
 require "app/entity/Agenda.php";
+require "app/entity/Utilisateur.php";
+require "app/Alert.php";
 
 use App\Autoloader;
 use App\Entity\Utilisateur;
@@ -132,27 +134,32 @@ $debutSemainePrecedente = (new DateTime($calendrier["lundi"]->format("Y-m-d")))-
 $debutSemaineSuivante = (new DateTime($calendrier["dimanche"]->format("Y-m-d")))->modify("next monday");
 
 if (isset($_POST["date-resa"])) {
-    require "app/config.php";
+    if (Utilisateur::IsAdmin($_SESSION["email"]) == 0) {
+        require "app/config.php";
 
-    // requête SQL
-    $sql = "INSERT INTO rdvs (utilisateur, date_rdv) VALUES (:email, :rdv)";
-    $email = $_SESSION["email"];
-    $rdv = $_POST["date-resa"];
+        // requête SQL
+        $sql = "INSERT INTO rdvs (utilisateur, date_rdv) VALUES (:email, :rdv)";
+        $email = $_SESSION["email"];
+        $rdv = $_POST["date-resa"];
 
 
-    // Préparer la requête
-    $query = $lienDB->prepare($sql);
+        // Préparer la requête
+        $query = $lienDB->prepare($sql);
 
-    // Liaison des paramètres de la requête préparée
-    $query->bindParam(":email", $email, PDO::PARAM_STR);
-    $query->bindParam(":rdv", $rdv, PDO::PARAM_STR);
+        // Liaison des paramètres de la requête préparée
+        $query->bindParam(":email", $email, PDO::PARAM_STR);
+        $query->bindParam(":rdv", $rdv, PDO::PARAM_STR);
 
-    // Exécution de la requête
-    if ($query->execute()) {
-        // traitement des résultats
-        $results = $query->fetch();
+        // Exécution de la requête
+        if ($query->execute()) {
+            // traitement des résultats
+            $results = $query->fetch();
+        }
+    } else {
+        Alert::AlertBox("IsAdmin");
     }
 }
+
 
 if (isset($_SESSION["email"])) {
 
@@ -197,6 +204,10 @@ if (isset($_GET["deleterdv"])) {
         $results = $query->fetchAll();
         // var_dump($resultsrdvlist);
     }
+}
+
+if(isset($_GET["alert"])){
+    Alert::AlertBox($_GET["alert"]);
 }
 
 ?>
@@ -268,14 +279,18 @@ if (isset($_GET["deleterdv"])) {
                     <?php for ($i = 0; $i < 5; $i++) : ?>
                         <div class="slot">
                             <?php if ((new DateTime()) < $jour) : ?>
-                                <?php if (Agenda::TakeIt($jour->format("Y-m-d H:i")) == null || Agenda::TakeIt($jour->format("Y-m-d H:i")) == "") : ?>
-                                    <form action="" method="post">
-                                    <input type="hidden" name="date-resa" value="<?= $jour->format("Y-m-d H:i"); ?>">
-                                    <button>Réserver pour <?= $jour->format("H:i"); ?></button>
-                                </form>
-                                <?php else : ?>
-                                <button class="reserved">Reserver</button>
+                                <?php if (Utilisateur::IsAdmin($_SESSION["email"])) : ?>
+                                    <?php if (Agenda::TakeIt($jour->format("Y-m-d H:i")) == null || Agenda::TakeIt($jour->format("Y-m-d H:i")) == "") : ?>
+                                        <form action="" method="post">
+                                            <input type="hidden" name="date-resa" value="<?= $jour->format("Y-m-d H:i"); ?>">
+                                            <button>Réserver pour <?= $jour->format("H:i"); ?></button>
+                                        </form>
+                                    <?php else : ?>
+                                        <a href="?alert=rdvtakeit"><button  class="reserved">Reserver by <?= Agenda::TakeIt($jour->format("Y-m-d H:i"))["utilisateur"] ?></button></a>
                                     <?php endif; ?>
+                                <?php else : ?>
+                                    <button class="reserved">Reserver</button>
+                                <?php endif; ?>
                             <?php else : ?>
                                 <button class="reserved"></button>
                             <?php endif; ?>
@@ -290,16 +305,29 @@ if (isset($_GET["deleterdv"])) {
 
         </div>
     </div>
-    <div class="listrdv">
     <?php
-                        $x = 0;
-                        while ($x < (count($resultsrdvlist))) { ?>
-                            <p value="<?= $resultsrdvlist[$x]["date_rdv"] ?>"><?= $resultsrdvlist[$x]["date_rdv"] ?></p>
-                            <a href="?deleterdv=<?= $resultsrdvlist[$x]["date_rdv"] ?>">Delete</a>
-                            <?php
-                                                                                                                        $x++;
-                                                                                                                    } ?>
-    </div>
+    if (Utilisateur::IsAdmin($_SESSION["email"])) {
+    ?>
+        <div class="admin">
+            <h3>Liste Admin</h3>
+            <p>Vos prochain rendez-vous</p>
+        </div>
+    <?php
+    } else {
+    ?>
+        <div class="listrdv">
+            <?php
+            $x = 0;
+            while ($x < (count($resultsrdvlist))) { ?>
+                <p value="<?= $resultsrdvlist[$x]["date_rdv"] ?>"><?= $resultsrdvlist[$x]["date_rdv"] ?></p>
+                <a href="?deleterdv=<?= $resultsrdvlist[$x]["date_rdv"] ?>">Delete</a>
+            <?php
+                $x++;
+            } ?>
+        </div>
+    <?php
+    }
+    ?>
 </body>
 
 </html>

@@ -19,7 +19,7 @@ Autoloader::register();
 $alert = new Alert();
 
 
-if (isset($_POST["email"]) && isset($_POST["password"]) && isset($_POST["confirmpassword"])) {
+if (isset($_POST["emailsignin"]) && isset($_POST["passwordsignin"]) && isset($_POST["confirmpassword"])) {
 
     require "app/config.php";
 

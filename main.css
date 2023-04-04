@@ -153,3 +153,35 @@ main.index form * {
 .slot button.reserved {
   background-color: #b129c364;
 }
+
+/* Alert CSS -------------------------------- */
+
+.alert {
+  height: fit-content;
+  position: absolute;
+  top: 50vh;
+  left: 50%;
+  padding: 10px;
+  background-color: rgba(212, 54, 54, 0.744);
+  border-radius: 10px;
+}
+
+.alert form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: fit-content;
+  padding: 10px;
+}
+.alert form * {
+  margin: 5px;
+}
+
+.buttonstyle {
+  padding: 5px;
+  color: #000000;
+  background-color: #c0c0c0;
+  text-decoration: none;
+  border-radius: 5px;
+  border: 1px solid #3c3c3c;
+}
