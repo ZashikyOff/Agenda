@@ -1,8 +1,14 @@
 * {
   margin: 0;
   padding: 0;
-
   box-sizing: border-box;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 main {
@@ -16,7 +22,16 @@ main.index form {
   align-items: center;
 }
 main.index form * {
-  margin: 5px;
+  margin: 7px;
+  outline: none;
+}
+main.index form input {
+  height: fit-content;
+  box-shadow: 7px 7px 14px #dbdbdb, -7px -7px 14px #ffffff;
+  outline: none;
+  padding: 5px;
+  border: none;
+  border-radius: 15px;
 }
 
 .agenda {
@@ -152,6 +167,27 @@ main.index form * {
 .slot button:hover,
 .slot button.reserved {
   background-color: #b129c364;
+}
+
+.admin {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 80vw;
+  height: fit-content;
+  padding: 15px;
+}
+.admin .rdv {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 75%;
+  gap: 10%;
+  margin-top: 25px;
+  padding: 10px;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
 }
 
 /* Alert CSS -------------------------------- */

@@ -78,4 +78,32 @@ class Utilisateur
             return $results["admin"];
         }
     }
+
+    public static function AllInfos(string $email)
+    {
+        // Connexion à la base de données
+        $dsn = "mysql:host=localhost;port=3306;dbname=agendor;charset=utf8";
+        $dbUser = "root";
+        $dbPassword = "";
+        $lienDB = new PDO($dsn, $dbUser, $dbPassword);
+
+        // requête SQL
+        $sql = "SELECT * FROM utilisateurs WHERE email=:email";
+
+
+        // Préparer la requête
+        $query = $lienDB->prepare($sql);
+
+        // Liaison des paramètres de la requête préparée
+        $query->bindParam(":email", $email, PDO::PARAM_STR);
+
+        // Exécution de la requête
+        if ($query->execute()) {
+            // traitement des résultats
+            $results = $query->fetch();
+
+            // var_dump($results);
+            return $results;
+        }
+    }
 }

@@ -206,7 +206,7 @@ if (isset($_GET["deleterdv"])) {
     }
 }
 
-if(isset($_GET["alert"])){
+if (isset($_GET["alert"])) {
     Alert::AlertBox($_GET["alert"]);
 }
 
@@ -286,7 +286,7 @@ if(isset($_GET["alert"])){
                                             <button>Réserver pour <?= $jour->format("H:i"); ?></button>
                                         </form>
                                     <?php else : ?>
-                                        <a href="?alert=rdvtakeit"><button  class="reserved">Reserver by <?= Agenda::TakeIt($jour->format("Y-m-d H:i"))["utilisateur"] ?></button></a>
+                                        <a href="?alert=rdvtakeit"><button class="reserved">Reserver by <?= Agenda::TakeIt($jour->format("Y-m-d H:i"))["utilisateur"] ?></button></a>
                                     <?php endif; ?>
                                 <?php else : ?>
                                     <button class="reserved">Reserver</button>
@@ -307,10 +307,43 @@ if(isset($_GET["alert"])){
     </div>
     <?php
     if (Utilisateur::IsAdmin($_SESSION["email"])) {
+        require "app/config.php";
+
+        // requête SQL
+        $sql = "SELECT * FROM rdvs";
+
+
+        // Préparer la requête
+        $query = $lienDB->prepare($sql);
+
+        // Exécution de la requête
+        if ($query->execute()) {
+            // traitement des résultats
+            $results = $query->fetchAll();
+
+            // var_dump($resultsrdvlist);
+        }
     ?>
         <div class="admin">
             <h3>Liste Admin</h3>
             <p>Vos prochain rendez-vous</p>
+            <?php
+            $x = 0;
+            while ($x < (count($results))) { 
+                ?>
+                <div class="rdv">
+                    <p><?= $results[$x]["date_rdv"] ?></p>
+                    <div class="infos">
+                        <p>Pseudo : <?= Utilisateur::AllInfos(Agenda::TakeIt($results[$x]["date_rdv"])["utilisateur"])["pseudo"] ?></p>
+                        <p>Nom : <?= Utilisateur::AllInfos(Agenda::TakeIt($results[$x]["date_rdv"])["utilisateur"])["nom"] ?></p>
+                        <p>Prénom : <?= Utilisateur::AllInfos(Agenda::TakeIt($results[$x]["date_rdv"])["utilisateur"])["prenom"] ?></p>
+                        <p>Téléphone : <?= Utilisateur::AllInfos(Agenda::TakeIt($results[$x]["date_rdv"])["utilisateur"])["telephone"] ?></p>
+                        <p>Email : <?= Utilisateur::AllInfos(Agenda::TakeIt($results[$x]["date_rdv"])["utilisateur"])["email"] ?></p>
+                    </div>
+                </div>
+            <?php
+                $x++;
+            } ?>
         </div>
     <?php
     } else {
